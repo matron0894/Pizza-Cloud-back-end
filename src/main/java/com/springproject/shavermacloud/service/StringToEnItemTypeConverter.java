@@ -1,4 +1,4 @@
-package com.springproject.shavermacloud.converter;
+package com.springproject.shavermacloud.service;
 
 import com.springproject.shavermacloud.domain.Ingredient;
 import com.springproject.shavermacloud.repos.IngredientRepository;
