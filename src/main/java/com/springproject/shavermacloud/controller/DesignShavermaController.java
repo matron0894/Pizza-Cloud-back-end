@@ -3,9 +3,9 @@ package com.springproject.shavermacloud.controller;
 import com.springproject.shavermacloud.domain.Ingredient;
 import com.springproject.shavermacloud.domain.Ingredient.Type;
 import com.springproject.shavermacloud.domain.Order;
-import com.springproject.shavermacloud.domain.Shaverma;
+import com.springproject.shavermacloud.domain.Product;
 import com.springproject.shavermacloud.repos.IngredientRepository;
-import com.springproject.shavermacloud.repos.ShavermaRepository;
+import com.springproject.shavermacloud.repos.ProductRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -22,16 +22,16 @@ import java.util.stream.Collectors;
 @Controller
 @Transactional
 @RequestMapping("/design")
-@SessionAttributes("order")
+@SessionAttributes(value = "order")
 public class DesignShavermaController {
 
     private final IngredientRepository ingredientRepo;
-    private final ShavermaRepository shavermaRepository;
+    private final ProductRepository productRepository;
 
     @Autowired
-    public DesignShavermaController(IngredientRepository ingredientRepo, ShavermaRepository shavermaRepository) {
+    public DesignShavermaController(IngredientRepository ingredientRepo, ProductRepository shavermaRepository) {
         this.ingredientRepo = ingredientRepo;
-        this.shavermaRepository = shavermaRepository;
+        this.productRepository = shavermaRepository;
     }
 
 //    @ModelAttribute(name = "order")
@@ -70,20 +70,15 @@ public class DesignShavermaController {
 
     @GetMapping
     public String showDesignForm(Model model) {
-//        List<Ingredient> ingredients = new ArrayList<>(ingredientRepo.findAll());
-//        Type[] types = Ingredient.Type.values();
-//        log.info("   --- Show Design shvm");
-//        for (Type type : types) {
-//            model.addAttribute(type.toString().toLowerCase(), filterByType(ingredients, type));
-//        }
-        model.addAttribute("order", new Order());
-        model.addAttribute("shaverma", new Shaverma());
+        if (!model.containsAttribute("order"))
+            model.addAttribute("order", new Order());
+        model.addAttribute("shaverma", new Product());
         return "design";
     }
 
 
     @PostMapping
-    public String processDesign(@Valid @ModelAttribute("shaverma") Shaverma shaverma,
+    public String processDesign(@Valid @ModelAttribute("shaverma") Product shaverma,
                                 Errors errors,
                                 @ModelAttribute(name = "order") Order order) {
 //        // Save the shvm design…
@@ -92,7 +87,7 @@ public class DesignShavermaController {
             return "design";
         }
         log.info("   --- Saving shaverma");
-        Shaverma newShav = shavermaRepository.save(shaverma);
+        Product newShav = productRepository.save(shaverma);
         order.addProduct(newShav);
         return "redirect:/orders/current";
     }

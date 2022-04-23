@@ -2,7 +2,6 @@ package com.springproject.shavermacloud.domain;
 
 
 import lombok.Data;
-import lombok.ToString;
 import org.hibernate.validator.constraints.CreditCardNumber;
 
 import javax.persistence.*;
@@ -71,13 +70,13 @@ public class Order implements Serializable {
             joinColumns = @JoinColumn(name = "order_id"),
             inverseJoinColumns = @JoinColumn(name = "shaverma_id")
     )
-    private List<Shaverma> products = new ArrayList<>();
+    private List<Product> products = new ArrayList<>();
 
-    public void addProduct(Shaverma shaverma) {
+    public void addProduct(Product shaverma) {
         this.products.add(shaverma);
     }
 
-    public void removeProduct(Shaverma shaverma) {
+    public void removeProduct(Product shaverma) {
         this.products.remove(shaverma);
 
     }

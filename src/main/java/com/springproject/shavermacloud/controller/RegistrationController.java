@@ -1,6 +1,8 @@
 package com.springproject.shavermacloud.controller;
 
 import com.springproject.shavermacloud.dao.RegistrationForm;
+import com.springproject.shavermacloud.domain.Role;
+import com.springproject.shavermacloud.domain.User;
 import com.springproject.shavermacloud.repos.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -8,12 +10,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.Collections;
+
 @Controller
 @RequestMapping("/register")
 public class RegistrationController {
 
-    private UserRepository userRepo;
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepo;
+    private final PasswordEncoder passwordEncoder;
 
     public RegistrationController(
             UserRepository userRepo, PasswordEncoder passwordEncoder) {
@@ -28,7 +32,9 @@ public class RegistrationController {
 
     @PostMapping
     public String processRegistration(RegistrationForm form) {
-        userRepo.save(form.toUser(passwordEncoder));
+        User user = form.toUser(passwordEncoder);
+        user.setRoles(Collections.singleton(Role.ROLE_USER));
+        userRepo.save(user);
         return "redirect:/login";
     }
 }

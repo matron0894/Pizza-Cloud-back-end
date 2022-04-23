@@ -1,10 +1,11 @@
 package com.springproject.shavermacloud.service;
 
 import com.springproject.shavermacloud.domain.Ingredient;
-import com.springproject.shavermacloud.domain.Shaverma;
+import com.springproject.shavermacloud.domain.Product;
+import com.springproject.shavermacloud.domain.Role;
 import com.springproject.shavermacloud.domain.User;
 import com.springproject.shavermacloud.repos.IngredientRepository;
-import com.springproject.shavermacloud.repos.ShavermaRepository;
+import com.springproject.shavermacloud.repos.ProductRepository;
 import com.springproject.shavermacloud.repos.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -12,6 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 @Configuration
 public class DevelopmentConfig {
@@ -20,7 +22,7 @@ public class DevelopmentConfig {
     public CommandLineRunner dataLoader(IngredientRepository repo,
                                         UserRepository userRepo,
                                         PasswordEncoder encoder,
-                                        ShavermaRepository shavermaRepository) { // user repo for ease of testing with a built-in user
+                                        ProductRepository shavermaRepository) { // user repo for ease of testing with a built-in user
         return args -> {
             Ingredient flourTortilla = new Ingredient("FLTO", "Flour Tortilla", Ingredient.Type.WRAP);
             Ingredient cornTortilla = new Ingredient("COTO", "Corn Tortilla", Ingredient.Type.WRAP);
@@ -43,22 +45,23 @@ public class DevelopmentConfig {
             repo.save(salsa);
             repo.save(sourCream);
 
-
-            userRepo.save(new User("a", encoder.encode("a"),
+            User user = new User("a", encoder.encode("a"),
                     "Craig Walls", "123 North Street", "Cross Roads", "TX",
-                    "76227", "123-123-1234"));
+                    "76227", "123-123-1234");
+            user.setRoles(Collections.singleton(Role.ROLE_USER));
+            userRepo.save(user);
 
-            Shaverma prod1 = new Shaverma();
+            Product prod1 = new Product();
             prod1.setName("Carnivore");
             prod1.setIngredients(Arrays.asList(flourTortilla, groundBeef, carnitas, sourCream, salsa, cheddar));
             shavermaRepository.save(prod1);
 
-            Shaverma prod2 = new Shaverma();
+            Product prod2 = new Product();
             prod2.setName("Bovine Bounty");
             prod2.setIngredients(Arrays.asList(cornTortilla, groundBeef, cheddar, jack, sourCream));
             shavermaRepository.save(prod2);
 
-            Shaverma prod3 = new Shaverma();
+            Product prod3 = new Product();
             prod3.setName("Veg-Out");
             prod3.setIngredients(Arrays.asList(flourTortilla, cornTortilla, tomatoes, lettuce, salsa));
             shavermaRepository.save(prod3);

@@ -17,7 +17,7 @@ import java.util.List;
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class Shaverma {
+public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
