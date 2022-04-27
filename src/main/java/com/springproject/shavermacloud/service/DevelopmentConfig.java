@@ -1,9 +1,6 @@
 package com.springproject.shavermacloud.service;
 
-import com.springproject.shavermacloud.domain.Ingredient;
-import com.springproject.shavermacloud.domain.Product;
-import com.springproject.shavermacloud.domain.Role;
-import com.springproject.shavermacloud.domain.User;
+import com.springproject.shavermacloud.domain.*;
 import com.springproject.shavermacloud.repos.IngredientRepository;
 import com.springproject.shavermacloud.repos.ProductRepository;
 import com.springproject.shavermacloud.repos.UserRepository;
@@ -45,10 +42,19 @@ public class DevelopmentConfig {
             repo.save(salsa);
             repo.save(sourCream);
 
-            User user = new User("a", encoder.encode("a"),
+            User admin = new User("admin", encoder.encode("secret"),
                     "Craig Walls", "123 North Street", "Cross Roads", "TX",
                     "76227", "123-123-1234");
-            user.setRoles(Collections.singleton(Role.ROLE_USER));
+            admin.setRoles(Collections.singleton(Role.ADMIN));
+            admin.setProvider(Provider.LOCAL);
+            userRepo.save(admin);
+
+
+            User user = new User("a", encoder.encode("a"),
+                    "San Sanych", "456 North Street", "Cross Roads", "TX",
+                    "76240", "567-034-4806");
+            user.setRoles(Collections.singleton(Role.USER));
+            user.setProvider(Provider.LOCAL);
             userRepo.save(user);
 
             Product prod1 = new Product();

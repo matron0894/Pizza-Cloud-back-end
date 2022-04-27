@@ -1,5 +1,9 @@
 package com.springproject.shavermacloud.security;
 
+import com.springproject.shavermacloud.handler.MySimpleUrlAuthenticationSuccessHandler;
+import com.springproject.shavermacloud.oauth2.CustomOAuth2User;
+import com.springproject.shavermacloud.oauth2.CustomOAuth2UserService;
+import com.springproject.shavermacloud.service.GoogleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,22 +14,29 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
+import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity(debug = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserDetailsService userDetailsService;
+    private final CustomOAuth2UserService oauthUserService;
 
     @Autowired
-    public SecurityConfig(UserDetailsService userDetailsService) {
+    public SecurityConfig(UserDetailsService userDetailsService, CustomOAuth2UserService oauthUserService) {
         this.userDetailsService = userDetailsService;
+
+        this.oauthUserService = oauthUserService;
     }
 
 
@@ -68,10 +79,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .authorizeRequests()
                 .mvcMatchers("/design", "/orders/**").hasRole("USER")
+                .antMatchers(HttpMethod.POST, "/admin/**").hasRole("ADMIN")
                 .mvcMatchers(HttpMethod.OPTIONS).permitAll() // needed for Angular/CORS
                 .mvcMatchers(HttpMethod.POST, "/api/ingredients").permitAll()
                 .mvcMatchers(HttpMethod.PATCH, "/ingredients").permitAll()
-                .mvcMatchers("/", "/**").permitAll()
+                .mvcMatchers("/", "/**", "/login", "/oauth/**").permitAll()
 
                 .and()
                 .formLogin()
@@ -80,11 +92,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .and()
                 .httpBasic()
-                .realmName("Shaverma Cloud")
+                .realmName("ShavermaCloud")
 
                 .and()
                 .logout()
                 .logoutSuccessUrl("/login")
+                .deleteCookies("JSESSIONID")
 
                 .and()
                 .csrf()
@@ -95,7 +108,40 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .headers()
                 .frameOptions()
                 .sameOrigin()
+
+
+                .and()
+                .oauth2Login()
+                .loginPage("/login")
+                .userInfoEndpoint()
+                .userService(oauthUserService)
+
+                .and()
+                .successHandler(myAuthenticationSuccessHandler())
+//                .successHandler(new AuthenticationSuccessHandler() {
+//                    @Override
+//                    public void onAuthenticationSuccess(HttpServletRequest request,
+//                                                        HttpServletResponse response,
+//                                                        Authentication authentication) throws IOException {
+//                        System.out.println("AuthenticationSuccessHandler invoked");
+//                        System.out.println("Authentication name: " + authentication.getName());
+//
+//                        CustomOAuth2User oauthUser = (CustomOAuth2User) authentication.getPrincipal();
+//                        userService.processOAuthPostLogin(oauthUser.getEmail());
+//
+////                        DefaultOidcUser oauthUser = (DefaultOidcUser) authentication.getPrincipal();
+////                        String email = oauthUser.getAttribute("email");
+////                        userService.processOAuthPostLogin(email);
+//                        response.sendRedirect("redirect:/design");
+//                    }
+//                })
+//                .defaultSuccessUrl("/design", true)
         ;
+    }
+
+    @Bean
+    public AuthenticationSuccessHandler myAuthenticationSuccessHandler(){
+        return new MySimpleUrlAuthenticationSuccessHandler();
     }
 
 //    @Bean

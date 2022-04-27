@@ -1,6 +1,7 @@
 package com.springproject.shavermacloud.controller;
 
 import com.springproject.shavermacloud.dao.RegistrationForm;
+import com.springproject.shavermacloud.domain.Provider;
 import com.springproject.shavermacloud.domain.Role;
 import com.springproject.shavermacloud.domain.User;
 import com.springproject.shavermacloud.repos.UserRepository;
@@ -30,10 +31,12 @@ public class RegistrationController {
         return "registration";
     }
 
+
     @PostMapping
     public String processRegistration(RegistrationForm form) {
         User user = form.toUser(passwordEncoder);
-        user.setRoles(Collections.singleton(Role.ROLE_USER));
+        user.setRoles(Collections.singleton(Role.USER));
+        user.setProvider(Provider.LOCAL);
         userRepo.save(user);
         return "redirect:/login";
     }

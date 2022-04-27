@@ -4,10 +4,15 @@ import com.springproject.shavermacloud.domain.Ingredient;
 import com.springproject.shavermacloud.domain.Ingredient.Type;
 import com.springproject.shavermacloud.domain.Order;
 import com.springproject.shavermacloud.domain.Product;
+import com.springproject.shavermacloud.domain.User;
 import com.springproject.shavermacloud.repos.IngredientRepository;
 import com.springproject.shavermacloud.repos.ProductRepository;
+import com.springproject.shavermacloud.repos.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -15,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,11 +31,13 @@ import java.util.stream.Collectors;
 @SessionAttributes(value = "order")
 public class DesignShavermaController {
 
+    private final UserRepository userRepository;
     private final IngredientRepository ingredientRepo;
     private final ProductRepository productRepository;
 
     @Autowired
-    public DesignShavermaController(IngredientRepository ingredientRepo, ProductRepository shavermaRepository) {
+    public DesignShavermaController(UserRepository userRepository, IngredientRepository ingredientRepo, ProductRepository shavermaRepository) {
+        this.userRepository = userRepository;
         this.ingredientRepo = ingredientRepo;
         this.productRepository = shavermaRepository;
     }
@@ -43,6 +51,12 @@ public class DesignShavermaController {
 //    public Shaverma design() {
 //        return new Shaverma();
 //    }
+
+    @ModelAttribute(name = "user")
+    public User user(@AuthenticationPrincipal Principal principal) {
+        String username = principal.getName();
+        return userRepository.findByUsername(username);
+    }
 
 
     @ModelAttribute
@@ -67,6 +81,7 @@ public class DesignShavermaController {
                     filterByType(ingredients, type));
         }
     }
+
 
     @GetMapping
     public String showDesignForm(Model model) {

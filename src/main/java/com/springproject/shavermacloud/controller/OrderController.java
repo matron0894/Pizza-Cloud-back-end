@@ -3,8 +3,11 @@ package com.springproject.shavermacloud.controller;
 import com.springproject.shavermacloud.domain.Order;
 import com.springproject.shavermacloud.domain.User;
 import com.springproject.shavermacloud.repos.OrderRepository;
+import com.springproject.shavermacloud.repos.UserRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.event.spi.PreInsertEvent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.support.SessionStatus;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import java.security.Principal;
 
 @Slf4j
 @Controller
@@ -26,30 +30,36 @@ import javax.validation.Valid;
 public class OrderController {
 
     private OrderRepository orderRepo;
+    private UserRepository userRepository;
 
     @Autowired
-    public OrderController(OrderRepository orderRepo) {
+    public OrderController(OrderRepository orderRepo, UserRepository userRepository) {
         this.orderRepo = orderRepo;
+        this.userRepository = userRepository;
     }
 
 
     @GetMapping("/orders/current")
-    public String orderForm(@AuthenticationPrincipal User user,
+    public String orderForm(@AuthenticationPrincipal Principal principal,
                             @ModelAttribute("order") Order order) {
-        if (order.getName() == null) {
-            order.setName(user.getFullname());
-        }
-        if (order.getState() == null) {
-            order.setState(user.getStreet());
-        }
-        if (order.getCity() == null) {
-            order.setCity(user.getCity());
-        }
-        if (order.getState() == null) {
-            order.setState(user.getState());
-        }
-        if (order.getZip() == null) {
-            order.setZip(user.getZip());
+        String email = principal.getName();
+        User user = userRepository.findByUsername(email);
+        if (user.getProvider() != null) {
+            if (order.getName() == null) {
+                order.setName(user.getFullname());
+            }
+            if (order.getState() == null) {
+                order.setState(user.getStreet());
+            }
+            if (order.getCity() == null) {
+                order.setCity(user.getCity());
+            }
+            if (order.getState() == null) {
+                order.setState(user.getState());
+            }
+            if (order.getZip() == null) {
+                order.setZip(user.getZip());
+            }
         }
         return "orderForm";
     }
