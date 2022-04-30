@@ -2,7 +2,9 @@ package com.springproject.shavermacloud.controller;
 
 import com.springproject.shavermacloud.service.OrderAdminService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -22,4 +24,6 @@ public class AdminController {
         adminService.deleteAllOrders();
         return "redirect:/admin";
     }
+
+    
 }

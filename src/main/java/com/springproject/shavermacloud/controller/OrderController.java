@@ -1,45 +1,45 @@
 package com.springproject.shavermacloud.controller;
 
 import com.springproject.shavermacloud.domain.Order;
+import com.springproject.shavermacloud.service.OrderProps;
 import com.springproject.shavermacloud.domain.User;
 import com.springproject.shavermacloud.repos.OrderRepository;
 import com.springproject.shavermacloud.repos.UserRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.event.spi.PreInsertEvent;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 
-import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.security.Principal;
 
 @Slf4j
 @Controller
-@Transactional
+@RequestMapping("/orders")
 //Если вам необходимо сохранить данные объекта (объект) между запросами,
 // то необходимо поместить этот объект в сессию
 @SessionAttributes(value = "order")
 public class OrderController {
 
+    private OrderProps props;
     private OrderRepository orderRepo;
     private UserRepository userRepository;
 
     @Autowired
-    public OrderController(OrderRepository orderRepo, UserRepository userRepository) {
+    public OrderController(OrderRepository orderRepo, UserRepository userRepository, OrderProps props) {
         this.orderRepo = orderRepo;
         this.userRepository = userRepository;
+        this.props = props;
     }
 
 
-    @GetMapping("/orders/current")
+    @GetMapping("/current")
     public String orderForm(@AuthenticationPrincipal Principal principal,
                             @ModelAttribute("order") Order order) {
         String email = principal.getName();
@@ -64,7 +64,7 @@ public class OrderController {
         return "orderForm";
     }
 
-    @PostMapping("/orders")
+    @PostMapping
     public String processOrder(@Valid @ModelAttribute("order") Order order,
                                Errors errors,
                                @AuthenticationPrincipal User user,
@@ -83,16 +83,14 @@ public class OrderController {
     }
 
 
-//    @GetMapping
-//    public String ordersForUser(
-//            @AuthenticationPrincipal User user, Model model) {
-//
-//        Pageable pageable = PageRequest.of(0, props.getPageSize());
-//        model.addAttribute("orders",
-//                orderRepo.findByUserProductOrderByCreatedAtDesc(user, pageable));
-//
-//        return "orderList";
-//    }
+    @GetMapping
+    public String ordersForUser(@AuthenticationPrincipal User user,
+                                Model model) {
+        Pageable pageable = PageRequest.of(0, props.getPageSize());// ограничить количество отображаемых заказов самыми последними 20 заказами
+        model.addAttribute("orders", orderRepo.findByUserOrderByCreatedAtDesc(user, pageable));
+
+        return "orderList";
+    }
 
 
 }
