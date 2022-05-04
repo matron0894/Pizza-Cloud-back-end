@@ -1,0 +1,14 @@
+{
+  "properties": [
+    {
+      "name": "product.orders.page-size",
+      "type": "java.lang.Integer",
+      "description": "Sets the maximum number of orders to display in a list."
+    },
+    {
+      "name": "product.discount.codes",
+      "type": "java.lang.Integer",
+      "description": "A map of discount codes to a discount percentage."
+    }
+  ]
+}

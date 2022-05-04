@@ -23,8 +23,13 @@ public class ProductRestController {
 
     @GetMapping(params = "recent")
     public Iterable<Product> recentProducts() {
-        PageRequest page = PageRequest.of(0, 12, Sort.by("createdAt").descending());
+        PageRequest page = PageRequest.of(0, 5, Sort.by("createdAt").descending());
         return productRepo.findAll(page).getContent();
+    }
+
+    @GetMapping
+    public Iterable<Product> allProducts() {
+        return productRepo.findAll();
     }
 
     @GetMapping("/{id}")

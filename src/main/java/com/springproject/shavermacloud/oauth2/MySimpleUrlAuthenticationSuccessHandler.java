@@ -1,13 +1,9 @@
-package com.springproject.shavermacloud.handler;
+package com.springproject.shavermacloud.oauth2;
 
 import com.springproject.shavermacloud.oauth2.CustomOAuth2User;
 import com.springproject.shavermacloud.service.GoogleService;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.web.DefaultRedirectStrategy;
-import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import javax.servlet.http.HttpServletRequest;

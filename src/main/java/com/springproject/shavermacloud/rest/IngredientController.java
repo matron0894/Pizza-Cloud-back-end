@@ -3,10 +3,8 @@ package com.springproject.shavermacloud.rest;
 import com.springproject.shavermacloud.domain.Ingredient;
 import com.springproject.shavermacloud.repos.IngredientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -24,6 +22,18 @@ public class IngredientController {
     @GetMapping
     public Iterable<Ingredient> allIngredients() {
         return repo.findAll();
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public Ingredient saveIngredient(@RequestBody Ingredient ingredient) {
+        return repo.save(ingredient);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteIngredient(@PathVariable("id") String ingredientId) {
+        repo.deleteById(ingredientId);
     }
 
 }

@@ -3,13 +3,22 @@
 <head>
     <title>Taco Cloud</title>
 </head>
+
 <body>
+
 <h1>Login</h1>
+
 <img th:src="@{/images/ShavermaLogo.jpg}"/>
-<div th:if="${error}"> Unable to login. Check your username and password.</div>
-<p>New here? Click
-    <a th:href="@{/register}">here</a> to register.</p>
+
+<div th:if="${param.error}"> Unable to login. Check your username and password.</div>
 <!-- tag::thAction[] -->
+<!--<a th:href="/oauth2/code/google">Sign in with Google</a>-->
+<div>
+    <a th:href="@{/oauth2/authorization/google}">Login with Google</a>
+</div>
+
+<div><p>OR</p></div>
+
 <form method="POST" th:action="@{/login}" id="loginForm">
     <!-- end::thAction[] -->
     <label for="username">Username: </label>
@@ -17,6 +26,9 @@
     <label for="password">Password: </label>
     <input type="password" name="password" id="password"/><br/>
     <input type="submit" value="Login"/>
+    <br/>
+    <p>New here? Click <a th:href="@{/register}">here</a> to register.</p>
+
 </form>
 </body>
 </html>

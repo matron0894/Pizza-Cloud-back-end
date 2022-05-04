@@ -2,6 +2,7 @@ package com.springproject.shavermacloud.domain;
 
 import lombok.*;
 import org.aspectj.weaver.ast.Or;
+import org.springframework.data.rest.core.annotation.RestResource;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -16,13 +17,14 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@RestResource(rel="products", path="products")
 @RequiredArgsConstructor
 public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
-    private Long id;
+    private Long Id;
 
     @NotBlank
     @Size(min = 5, message = "Name must be at least 5 characters long")
@@ -30,7 +32,7 @@ public class Product {
     private String name;
 
     @Temporal(TemporalType.DATE)
-    @Column(name = "created_date", nullable = false, updatable = false)
+    @Column(/*name = "created_date",*/ nullable = false, updatable = false)
     private Date createdAt;
 
     @PrePersist

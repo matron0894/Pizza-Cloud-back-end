@@ -11,11 +11,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
 @RestController
-@RequestMapping(path = "/api/product", produces = "application/json")
+@RequestMapping(path = "/api/orders", produces = "application/json")
 @CrossOrigin(origins = "http://tacocloud:8080")
 public class OrderRestController {
 
@@ -34,11 +35,15 @@ public class OrderRestController {
         return orderRepo.save(order);
     }
 
-
     @PatchMapping(path = "/{orderId}", consumes = "application/json")
     public Order patchOrder(@PathVariable("orderId") Long orderId,
                             @RequestBody Order patch) {
-        Order order = orderRepo.findById(orderId).get();
+        Optional<Order> optional = orderRepo.findById(orderId);
+        Order order = new Order();
+
+        if (optional.isPresent()) order = optional
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order don't patch"));
+
         if (patch.getName() != null) {
             order.setName(patch.getName());
         }
