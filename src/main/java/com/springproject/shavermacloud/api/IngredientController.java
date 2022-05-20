@@ -1,4 +1,4 @@
-package com.springproject.shavermacloud.rest;
+package com.springproject.shavermacloud.api;
 
 import com.springproject.shavermacloud.domain.Ingredient;
 import com.springproject.shavermacloud.repos.IngredientRepository;

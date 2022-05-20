@@ -2,7 +2,6 @@ package com.springproject.shavermacloud.service;
 
 import com.springproject.shavermacloud.domain.Ingredient;
 import com.springproject.shavermacloud.repos.IngredientRepository;
-import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;

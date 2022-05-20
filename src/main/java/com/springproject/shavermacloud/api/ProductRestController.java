@@ -1,4 +1,4 @@
-package com.springproject.shavermacloud.rest;
+package com.springproject.shavermacloud.api;
 
 import com.springproject.shavermacloud.domain.Product;
 import com.springproject.shavermacloud.repos.ProductRepository;
@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping(path = "/api/products", produces = "application/json")
-@CrossOrigin(origins = "http://tacocloud:8080")
+@CrossOrigin(origins = "http://localhost:8080")
 public class ProductRestController {
 
     private final ProductRepository productRepo;

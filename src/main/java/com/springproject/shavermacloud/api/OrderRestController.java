@@ -1,13 +1,9 @@
-package com.springproject.shavermacloud.rest;
+package com.springproject.shavermacloud.api;
 
 import com.springproject.shavermacloud.domain.Order;
-import com.springproject.shavermacloud.domain.Product;
+import com.springproject.shavermacloud.messaging.jms.services.JmsOrderMessagingService;
 import com.springproject.shavermacloud.repos.OrderRepository;
-import com.springproject.shavermacloud.repos.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,16 +13,29 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping(path = "/api/orders", produces = "application/json")
-@CrossOrigin(origins = "http://tacocloud:8080")
+@CrossOrigin(origins = "http://localhost:8080")
 public class OrderRestController {
 
     private final OrderRepository orderRepo;
+    private final JmsOrderMessagingService messageService;
 
     @Autowired
-    public OrderRestController(OrderRepository orderRepo) {
+    public OrderRestController(OrderRepository orderRepo, JmsOrderMessagingService messageService) {
         this.orderRepo = orderRepo;
+        this.messageService = messageService;
     }
 
+    @GetMapping(produces = "application/json")
+    public Iterable<Order> allOrders() {
+        return orderRepo.findAll();
+    }
+
+    @PostMapping(consumes = "application/json")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Order postOrder(@RequestBody Order order) {
+        messageService.sendOrder(order);
+        return orderRepo.save(order);
+    }
 
     @PutMapping(path = "/{orderId}", consumes = "application/json")
     public Order putOrder(@PathVariable("orderId") Long orderId,
@@ -71,8 +80,9 @@ public class OrderRestController {
         return orderRepo.save(order);
     }
 
+
+
     @DeleteMapping("/{orderId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<HttpStatus> deleteOrder(@PathVariable("orderId") Long orderId) {
         Optional<Order> opt = orderRepo.findById(orderId);
         if (opt.isPresent()) {

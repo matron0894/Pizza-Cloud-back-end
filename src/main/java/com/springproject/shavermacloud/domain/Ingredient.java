@@ -1,19 +1,18 @@
 package com.springproject.shavermacloud.domain;
 
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Table;
 
-
-@Entity
-@Getter
-@Setter
+@Data
 @RequiredArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
-@Table(name = "INGREDIENTS")
+@Entity
 public class Ingredient {
 
     @Id
@@ -28,6 +27,5 @@ public class Ingredient {
         WRAP, PROTEIN, VEGGIES, CHEESE, SAUCE
     }
 
-//    @ManyToMany(mappedBy = "ingredients")
-//    private List<Shaverma> shaverms = new ArrayList<>();
+
 }

@@ -4,11 +4,15 @@ import com.springproject.shavermacloud.domain.Ingredient;
 import com.springproject.shavermacloud.domain.Ingredient.Type;
 import com.springproject.shavermacloud.domain.Order;
 import com.springproject.shavermacloud.domain.Product;
+import com.springproject.shavermacloud.domain.User;
+import com.springproject.shavermacloud.oauth2.CustomOAuth2User;
 import com.springproject.shavermacloud.repos.IngredientRepository;
 import com.springproject.shavermacloud.repos.ProductRepository;
 import com.springproject.shavermacloud.repos.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,18 +61,6 @@ public class DesignShavermaController {
 
     @ModelAttribute
     public void addIngredientsToModel(Model model) {
-//        List<Ingredient> ingredients = Arrays.asList(
-//                new Ingredient("FLTO", "Flour Tortilla", Type.WRAP),
-//                new Ingredient("COTO", "Corn Tortilla", Type.WRAP),
-//                new Ingredient("GRBF", "Ground Beef", Type.PROTEIN),
-//                new Ingredient("CARN", "Carnitas", Type.PROTEIN),
-//                new Ingredient("TMTO", "Diced Tomatoes", Type.VEGGIES),
-//                new Ingredient("LETC", "Lettuce", Type.VEGGIES),
-//                new Ingredient("CHED", "Cheddar", Type.CHEESE),
-//                new Ingredient("JACK", "Monterrey Jack", Type.CHEESE),
-//                new Ingredient("SLSA", "Salsa", Type.SAUCE),
-//                new Ingredient("SRCR", "Sour Cream", Type.SAUCE)
-//        );
         List<Ingredient> ingredients = ingredientRepo.findAll();
 
         Type[] types = Ingredient.Type.values();
@@ -75,6 +68,18 @@ public class DesignShavermaController {
             model.addAttribute(type.toString().toLowerCase(),
                     filterByType(ingredients, type));
         }
+    }
+
+    @ModelAttribute(name = "user")
+    public User user(Principal principal) {
+        String username;
+        if (principal instanceof OAuth2AuthenticationToken) {
+            CustomOAuth2User ud = (CustomOAuth2User) ((Authentication) principal).getPrincipal();
+            username = ud.getEmail();
+        } else {
+            username = principal.getName();
+        }
+        return userRepository.findByUsername(username);
     }
 
 
@@ -89,15 +94,17 @@ public class DesignShavermaController {
 
     @PostMapping
     public String processDesign(@Valid @ModelAttribute("shaverma") Product shaverma,
+                                @ModelAttribute("user") User user,
                                 Errors errors,
                                 @ModelAttribute(name = "order") Order order) {
 //        // Save the shvm design…
-        log.info("   --- Processing taco");
+        log.info("   --- Processing product");
         if (errors.hasErrors()) {
             return "design";
         }
-        log.info("   --- Saving shaverma");
+        log.info("   --- Saving product");
         Product newShav = productRepository.save(shaverma);
+        order.setUser(user);
         order.addProduct(newShav);
         return "redirect:/orders/current";
     }

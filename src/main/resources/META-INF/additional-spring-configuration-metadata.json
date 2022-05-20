@@ -9,6 +9,16 @@
       "name": "product.discount.codes",
       "type": "java.lang.Integer",
       "description": "A map of discount codes to a discount percentage."
+    },
+    {
+      "name": "app.cors.allowedOrigins",
+      "type": "java.lang.String",
+      "description": "Description for app.cors.allowedOrigins."
+    },
+    {
+      "name": "prodcloud.order.queue",
+      "type": "java.lang.String",
+      "description": "Description for prodcloud.order.queue."
     }
   ]
 }

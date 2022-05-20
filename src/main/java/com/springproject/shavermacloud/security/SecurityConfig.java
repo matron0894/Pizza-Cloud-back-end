@@ -2,6 +2,7 @@ package com.springproject.shavermacloud.security;
 
 import com.springproject.shavermacloud.oauth2.MySimpleUrlAuthenticationSuccessHandler;
 import com.springproject.shavermacloud.oauth2.CustomOAuth2UserService;
+import com.springproject.shavermacloud.repos.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +16,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import javax.transaction.Transactional;
@@ -38,7 +40,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth)
             throws Exception {
-
         auth.inMemoryAuthentication()
                 .withUser("buzz")
                 .password("infinity")
@@ -47,7 +48,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .withUser("woody")
                 .password("bullseye")
                 .authorities("ROLE_USER");
-
 
         auth.authenticationProvider(getProvider());
     }
@@ -72,11 +72,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .mvcMatchers("/design", "/orders/**").hasRole("USER")
-                .antMatchers(HttpMethod.POST, "/admin/**").hasRole("ADMIN")
                 .mvcMatchers(HttpMethod.OPTIONS).permitAll() // needed for Angular/CORS
-                .antMatchers("/api/ingredients", "/api/ingredients/**").hasRole("ADMIN")
-//                .mvcMatchers(HttpMethod.GET, "/api/ingredients").permitAll()
+
+                .antMatchers(HttpMethod.POST, "/admin/**").hasRole("ADMIN")
+
+                .antMatchers(HttpMethod.POST, "/api/ingredients").hasRole("ADMIN")
+                .antMatchers(HttpMethod.DELETE, "/api/ingredients").hasRole("ADMIN")
+
+                .mvcMatchers("/design", "/orders/**").hasRole("USER")
                 .mvcMatchers(HttpMethod.PATCH, "/ingredients").permitAll()
                 .mvcMatchers("/", "/**", "/login", "/oauth/**").permitAll()
 
@@ -87,7 +90,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .and()
                 .httpBasic()
-                .realmName("ShavermaCloud")
+                .realmName("Product_Cloud")
 
                 .and()
                 .logout()
@@ -104,7 +107,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .frameOptions()
                 .sameOrigin()
 
-
+                //external server authorisation
                 .and()
                 .oauth2Login()
                 .loginPage("/login")
@@ -139,9 +142,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new MySimpleUrlAuthenticationSuccessHandler();
     }
 
-//    @Bean
-//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-//        return http.build();
-//    }
 
 }

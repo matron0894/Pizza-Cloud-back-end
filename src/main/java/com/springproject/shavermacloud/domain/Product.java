@@ -1,7 +1,6 @@
 package com.springproject.shavermacloud.domain;
 
 import lombok.*;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.data.rest.core.annotation.RestResource;
 
 import javax.persistence.*;
@@ -10,7 +9,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 
 
