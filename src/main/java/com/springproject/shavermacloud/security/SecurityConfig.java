@@ -1,8 +1,7 @@
 package com.springproject.shavermacloud.security;
 
-import com.springproject.shavermacloud.oauth2.MySimpleUrlAuthenticationSuccessHandler;
 import com.springproject.shavermacloud.oauth2.CustomOAuth2UserService;
-import com.springproject.shavermacloud.repos.UserRepository;
+import com.springproject.shavermacloud.oauth2.MySimpleUrlAuthenticationSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +15,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import javax.transaction.Transactional;
@@ -76,8 +74,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .antMatchers(HttpMethod.POST, "/admin/**").hasRole("ADMIN")
 
-                .antMatchers(HttpMethod.POST, "/api/ingredients").hasRole("ADMIN")
-                .antMatchers(HttpMethod.DELETE, "/api/ingredients").hasRole("ADMIN")
+                .antMatchers(HttpMethod.POST, "/api/ingredients").permitAll() //.hasRole("ADMIN")
+                .antMatchers("/api/products/**", "/api/ingredients").permitAll()  //.hasRole("ADMIN")
 
                 .mvcMatchers("/design", "/orders/**").hasRole("USER")
                 .mvcMatchers(HttpMethod.PATCH, "/ingredients").permitAll()
@@ -90,12 +88,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .and()
                 .httpBasic()
-                .realmName("Product_Cloud")
+                .realmName("Product Cloud")
 
                 .and()
                 .logout()
                 .logoutSuccessUrl("/login")
-                .deleteCookies("JSESSIONID")
+                //.deleteCookies("JSESSIONID")
 
                 .and()
                 .csrf()
