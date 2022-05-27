@@ -1,5 +1,6 @@
 package com.springproject.shavermacloud.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.springframework.data.rest.core.annotation.RestResource;
 
@@ -22,6 +23,7 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
+    @JsonIgnore
     private Long Id;
 
     @NotBlank

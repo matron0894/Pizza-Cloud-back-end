@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.Collections;
 
 @Configuration
-
 public class DevelopmentConfig {
 
     @Bean

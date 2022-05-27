@@ -1,4 +1,4 @@
-package com.springproject.shavermacloud.service;
+package com.springproject.shavermacloud.domain;
 
 
 import java.util.HashMap;

@@ -1,6 +1,6 @@
 package com.springproject.shavermacloud.controller;
 
-import com.springproject.shavermacloud.service.DiscountCodeProps;
+import com.springproject.shavermacloud.domain.DiscountCodeProps;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;

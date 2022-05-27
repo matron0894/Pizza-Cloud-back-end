@@ -13,7 +13,7 @@
     {
       "name": "app.cors.allowedOrigins",
       "type": "java.lang.String",
-      "description": "Description for app.cors.allowedOrigins."
+      "description": "Host's for CORS operations."
     },
     {
       "name": "prodcloud.order.queue",

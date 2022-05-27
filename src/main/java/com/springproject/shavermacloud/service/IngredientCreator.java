@@ -2,10 +2,15 @@ package com.springproject.shavermacloud.service;
 
 import com.springproject.shavermacloud.domain.Ingredient;
 import com.springproject.shavermacloud.repos.IngredientRepository;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 
 import java.util.Arrays;
 import java.util.List;
 
+@Configuration
 public class IngredientCreator {
 
     private final IngredientRepository ingredientRepos;
@@ -15,6 +20,7 @@ public class IngredientCreator {
         create();
     }
 
+    @Profile("prod")
     private void create() {
         List<Ingredient> ingredients = Arrays.asList(
                 new Ingredient("FLTO", "Flour Tortilla", Ingredient.Type.WRAP),
