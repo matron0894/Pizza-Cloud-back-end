@@ -13,7 +13,7 @@ import org.springframework.integration.mail.dsl.Mail;
 @Configuration
 public class OrderEmailIntegrationConfig {
 
-    //Imap Inbound Adapter — Service Activator — Service Activator — Filter — Jpa Outbound Adapter
+    //Imap Inbound Adapter — Service Activator — Service Activator — Jpa Outbound Adapter
 
 
     //JAVA DSL
@@ -27,7 +27,7 @@ public class OrderEmailIntegrationConfig {
 
         return IntegrationFlows.from(Mail.imapInboundAdapter(
                                         emailProps.getImapUrl())
-                                .userFlag("testSIUserFlag")
+                                .userFlag("testUserFlag")
                                 .simpleContent(true)
                                 .javaMailProperties(p -> {
                                     p.put("mail.debug", "true");
@@ -46,7 +46,7 @@ public class OrderEmailIntegrationConfig {
 
 /*
     //вспомогательный поток - сгенерируем данные, отправим Animals в почтовый ящик.
-    //но можно вручную отправить пиьсма с текстом
+    //но можно вручную отправить письма с текстом
     @Bean
     public IntegrationFlow sendMailFlow() {
         return IntegrationFlows.from("sendMailChannel")

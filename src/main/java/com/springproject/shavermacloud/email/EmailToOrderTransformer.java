@@ -6,7 +6,6 @@ import com.springproject.shavermacloud.email.dao.EmailProduct;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.mail.util.MimeMessageParser;
 import org.apache.commons.text.similarity.LevenshteinDistance;
-import org.jsoup.Jsoup;
 import org.springframework.integration.mail.transformer.AbstractMailMessageTransformer;
 import org.springframework.integration.support.AbstractIntegrationMessageBuilder;
 import org.springframework.integration.support.MessageBuilder;
@@ -15,9 +14,7 @@ import org.springframework.stereotype.Component;
 import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.Multipart;
 import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import java.io.ByteArrayOutputStream;
@@ -54,6 +51,9 @@ public class EmailToOrderTransformer extends AbstractMailMessageTransformer<Emai
 
     private static final String SUBJECT_KEYWORDS = "ORDER";
 
+
+    //удобный базовый класс для обработки сообщений, чья полезная нагрузка - это электронная почта.
+    // Он заботится о извлечении информации электронной почты из входящего сообщения в объект Message
     @Override
     protected AbstractIntegrationMessageBuilder<EmailOrder> doTransform(Message mailMessage) throws Exception {
         EmailOrder emailOrder = processPayload(mailMessage);
@@ -70,88 +70,39 @@ public class EmailToOrderTransformer extends AbstractMailMessageTransformer<Emai
                 String email = ((InternetAddress) mailMessage.getFrom()[0]).getPersonal(); //Мария Батырева
                 if (email == null) email = ((InternetAddress) mailMessage.getFrom()[0]).getAddress();
 
-                /*
-                //get data
-                Object content = mailMessage.getContent();
-                String contentReturn = null;
-
-                if (content instanceof String) {
-                    contentReturn = (String) content;
-                    System.out.println(contentReturn);
-                } else {
-
-                    mailMessage.writeTo(System.out);
-                    ByteArrayOutputStream baos = null;
-                    try {
-                        baos = new ByteArrayOutputStream();
-                        mailMessage.writeTo(baos);
-                    } catch (Exception ignored) {
-                    } finally {
-                        try {
-                            Objects.requireNonNull(baos).close();
-                        } catch (Exception e) {
-                            log.error("Couldn't close byte array output stream");
-                        }
-                    }
-                    String s = baos.toString(StandardCharsets.UTF_8);
-                    System.out.println(s);
-                }*/
-                String incontent = getTextFromMessage(mailMessage);
-                return parseEmailToOrder(email, incontent);
+                String content = getTextFromMessage(mailMessage);
+                return parseEmailToOrder(email, content);
             }
-        } catch (MessagingException e) {
+        } catch (MessagingException | IOException e) {
             log.error("MessagingException: {%s}", e);
-        } catch (IOException e) {
-            log.error("IOException: {%s}", e);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
         return null;
     }
 
-    private String getTextFromMessage(Message message) throws Exception {
-        String result = "";
-        MimeMessage mp = (MimeMessage) message;
-
-        if (message.isMimeType("text/plain")) {
-            String data = new MimeMessageParser(mp).parse().getPlainContent();
-            result = message.getContent().toString();
-        }
-
-        if (message.isMimeType("multipart/*")) {
+    private String getTextFromMessage(Message message) throws IOException, MessagingException{
+        Object content = message.getContent();
+        if (content instanceof String) {
+            return message.getContent().toString();
+        } else if (content instanceof MimeMultipart) {
             MimeMultipart mimeMultipart = (MimeMultipart) message.getContent();
-            mimeMultipart.writeTo(System.out);
-            result = getTextFromMimeMultipart(mimeMultipart);
+            return getTextFromMimeMultipart(mimeMultipart);
         }
-        return result;
+        return "";
     }
 
     private String getTextFromMimeMultipart(MimeMultipart mimeMultipart) {
         try {
-            for (int i = 0; i < mimeMultipart.getCount(); i++) {
-                BodyPart bodyPart = mimeMultipart.getBodyPart(i);
-                String type = bodyPart.getContentType(); //text/plain; charset="UTF-8
-                if (type.contains("text/plain")) { //text/plain; charset="UTF-8
-                    //mimeMultipart.writeTo(System.out);
-                    ByteArrayOutputStream baos = null;
-                    try {
-                        baos = new ByteArrayOutputStream();
-                        mimeMultipart.writeTo(baos);
-                    } catch (Exception ignored) {
-                    } finally {
-                        try {
-                            Objects.requireNonNull(baos).close();
-                        } catch (Exception e) {
-                            log.error("Couldn't close byte array output stream");
-                        }
-                    }
-                    return "";
-                } else if (bodyPart.getContent() instanceof MimeMultipart) {
+            int count = mimeMultipart.getCount();
+            for (int i = 0; i < count; i++) {
+                BodyPart content = mimeMultipart.getBodyPart(i);
+
+                if (content.getContentType().contains("text/plain")) { //text/plain; charset="UTF-8
+                    System.out.println("=========  multipart/* 2 ====================");
+                    return content.getContent().toString();
+                } else if (content.getContent() instanceof MimeMultipart) {
                     return "";
                 }
             }
-        } catch (MessagingException | IOException e) {
-            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
