@@ -36,10 +36,10 @@ public class DesignShavermaController {
     private final ProductRepository productRepository;
 
     @Autowired
-    public DesignShavermaController(UserRepository userRepository, IngredientRepository ingredientRepo, ProductRepository shavermaRepository) {
+    public DesignShavermaController(UserRepository userRepository, IngredientRepository ingredientRepo, ProductRepository productRepository) {
         this.userRepository = userRepository;
         this.ingredientRepo = ingredientRepo;
-        this.productRepository = shavermaRepository;
+        this.productRepository = productRepository;
     }
 
 //    @ModelAttribute(name = "order")
@@ -87,13 +87,13 @@ public class DesignShavermaController {
     public String showDesignForm(Model model) {
         if (!model.containsAttribute("order"))
             model.addAttribute("order", new Order());
-        model.addAttribute("shaverma", new Product());
+        model.addAttribute("product", new Product());
         return "design";
     }
 
 
     @PostMapping
-    public String processDesign(@Valid @ModelAttribute("shaverma") Product shaverma,
+    public String processDesign(@Valid @ModelAttribute("product") Product product,
                                 @ModelAttribute("user") User user,
                                 Errors errors,
                                 @ModelAttribute(name = "order") Order order) {
@@ -103,9 +103,9 @@ public class DesignShavermaController {
             return "design";
         }
         log.info("   --- Saving product");
-        Product newShav = productRepository.save(shaverma);
+        Product newProd = productRepository.save(product);
         order.setUser(user);
-        order.addProduct(newShav);
+        order.addProduct(newProd);
         return "redirect:/orders/current";
     }
 
