@@ -15,10 +15,10 @@ import java.util.Collections;
 import java.util.Map;
 
 @SpringBootApplication
-public class ShavermaCloudApplication {
+public class ProductCloudApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(ShavermaCloudApplication.class, args);
+        SpringApplication.run(ProductCloudApplication.class, args);
     }
 
     @Bean
